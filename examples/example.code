@@ -1,0 +1,94 @@
+~
+COMMENTS
+~
+
+# This is a comment
+
+~ 
+This is a multiline comment 
+~
+
+~
+PREPROCESSOR DIRECTIVES
+~
+
+# All preprocessor directivves begin with a '@'
+@include stdlib
+
+~
+STATEMENTS & OPERATORS
+~
+
+# The basic order of a statement is an operator followed by its arguments. 
+print "Hello World!" "\n" "This is another line!"
+
+# 
+
+# Operators can be defined as follows
+operator <operatorName> <arguments> 
+
+# e.g.
+operator addTwo (number1) (number2) {
+   + number1 number2
+}
+
+# The above example shows the recommened syntax for defining an operator.
+# However, the parenthesis are optional (and can be added around any expression
+# along with brackets) and the curly-brackets just allow for you to continue an 
+# expression past a newline (parentheses and brackets also do this). 
+# Normally a newline acts like a ';' in C/C++ and seperates statements.
+
+# The following are other "technically" correct ways of defining an operator
+operator (addTwo) number1 (number2) (+ number1 number2)
+operator [addTwo] [number1] [number2] [+ number1 number2]
+operator addTwo number1 number2 (+ number1 number2)
+
+# Note how parenthesis and brackets can not go around the word operator (which is
+# the operator in these statements). If there are parenthesis around an operator,
+# it would mean that the operator was an expression on its own and requires no
+# arguments. 
+
+# "Type operators" allow you to restrict the arguments of an operator to specific
+# types. At runtime these act like unary operators that return a special exception 
+# type (INVALID) if their argument is not of the specified type otherwise 
+# they return their argument. All operators (except for the catch operator) return 
+# the INVALID type upon recieving the invalid type as an argument. At compile time
+# these operators are flagged by the compiler, and whenenver the compiler sees
+# the operator being referrenced with an argument of a different type it causes an
+# error.
+
+operator addTwo (int number1) (int number2) {int (
+    + number1 number2
+)}
+
+# Exceptions travel outward from the expression that created them collecting data
+# as they go. If they are catched (using the catch operator) that data 
+# can be read. If they are not caught they crash the program and dump the data
+
+
+
+~
+VARIABLES & DATATYPES
+~
+# Variables can be defined as follows
+set x 0
+
+# This is the same as creating an operator x that returns 0
+operator x 0
+
+# In fact, set is just an alternative name for the "operator" operator.
+
+
+
+
+# Just as variables can be seen as operators, operators can be seen as variables.
+# In fact the "operator" operator is formally defined from the set operator as follows.
+set operator {
+    (set number1 arg1)
+    (set number2 arg2)
+}
+ 
+{int ((set number1 arg2) (set number2 arg1) (+ number1 number2 ))}
+
+# There are 4 main kinds of datatypes recognized by the compiler
+# 1. string - a type of expression characterized by a  

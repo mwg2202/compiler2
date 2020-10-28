@@ -1,0 +1,21 @@
+~
+Sample.code
+10/27/2020
+Standard Version: Dev1
+~
+
+# Commas are parsed as )(. This makes c-like syntax compatible
+# with lisp like syntax
+
+# fprint <file> <string> <string> <string> ...
+# appends strings to the end of a file
+
+fprint myFile.home "Hello World"; fprint("Hello World", intToString(x), intToString(y))
+[fprint ("Hello World") (intToString (x)) (intToString (y))]
+fprint myFile.txt(
+    "Hello World"
+)
+
+# print <string> <string> <string> ...
+# works like fprint, but the file is forced to be the terminal
+
