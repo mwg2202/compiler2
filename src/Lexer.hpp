@@ -15,10 +15,16 @@ enum Type {
 
 struct Token {
     Type type = NONE;
-    void *value = NULL;
+    union {
+        std::string stringValue;
+        int intValue;
+    };
 
-    inline Token(Type type, void *value): 
-        type(type), value(value) {}
+    inline Token(Type type, std::string stringValue): 
+        type(type), stringValue(stringValue) {}
+    
+    inline Token(Type type, int intValue):
+        type(type), intValue(intValue);
 };
 
 class Lexer {
@@ -28,10 +34,10 @@ class Lexer {
         
         // Reads the file and turns the text into a stream of tokens
         Lexer(CmdParser);
-        void MakeToken(FILE*, std::vector<Token> &, char);
-        Token ListToToken(FILE*);
-        Token MakeStringToken(FILE*, Type, char);
-        void PrintToFile();
+        std::vector<Token> MakeTokenStream(ifstream &);
+        Token MakeToken(ifstream &);
+        
+        void PrintToFile(std::vector<Token> &, ofstream &);
 };
 
 extern const char *typeName[];

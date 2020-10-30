@@ -121,6 +121,9 @@ void PrintError(ErrorCode errorCode, std::string& errorString = "") {
         case (INVALID_DIRECTIVE):
             std::cerr << "Error: invalid preprocessor directive \"" << errorString << "\"\n";
             std::exit(1);
+
+        case (INCOMPLETE_ARRAY):
+            std::cerr << "Error: File ended in the middle of a character array or string\n";
         // errorString contains error message
         default:
             std::cerr << "Error: " << errorString << std::endl;
