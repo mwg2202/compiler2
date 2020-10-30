@@ -10,16 +10,26 @@ include(FetchContent)
 set(files
     "src/CmdParser.cpp"
     "src/Preprocessor.cpp" 
-    "src/Lexer.cpp"
-)
+    "src/Lexer.cpp")
 
 add_executable(${PROJECT_NAME} 
     "src/main.cpp"
-    ${files}
-)
+    ${files})
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
 add_executable(test 
     "tests/test.cpp"
     ${files})
 target_include_directories(test PUBLIC src tests)
+
+add_custom_command(
+    TARGET test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/tests/test.code
+            ${CMAKE_CURRENT_BINARY_DIR}/test.code)
+
+add_custom_command(
+    TARGET test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/tests/test2.code
+            ${CMAKE_CURRENT_BINARY_DIR}/test2.code)

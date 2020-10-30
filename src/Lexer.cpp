@@ -17,7 +17,7 @@ Lexer::Lexer(CmdParser cmdParser): cmdParserData(cmdParser.cmdParserData) {
         if (status = EOF) break;
 
         // Make the next token and put it on the token stream
-        MakeToken(preFile, &tokens, currChar);
+        MakeToken(preFile, tokens, currChar);
     }
     
     // Print the token stream to a file if requested by user
@@ -27,40 +27,40 @@ Lexer::Lexer(CmdParser cmdParser): cmdParserData(cmdParser.cmdParserData) {
 
 
 // Makes the token and puts it onto the tokensToEdit
-void Lexer::MakeToken(FILE *preFile, std::vector<Token> *tokensToEdit, char currChar) {
+void Lexer::MakeToken(FILE *preFile, std::vector<Token> &tokensToEdit, char currChar) {
 
     // If it is a digit, handle it
     if (isdigit(currChar)) {
-        tokensToEdit->push_back(MakeStringToken(preFile, INT, '\''));
+        tokensToEdit.push_back(MakeStringToken(preFile, INT, '\''));
         return;
     }
 
     // If it is not a digit handle it
     switch (currChar) {
         // Special cases
-        case '\'': tokensToEdit->push_back(MakeStringToken(preFile, CHAR, '\'')); break;
-        case '\"': tokensToEdit->push_back(MakeStringToken(preFile, STRING, '\"')); break;
-        case '[' : tokensToEdit->push_back(Lexer::ListToToken(preFile)); break;
+        case '\'': tokensToEdit.push_back(MakeStringToken(preFile, CHAR, '\'')); break;
+        case '\"': tokensToEdit.push_back(MakeStringToken(preFile, STRING, '\"')); break;
+        case '[' : tokensToEdit.push_back(Lexer::ListToToken(preFile)); break;
         
         // Normal cases
-        case '.': tokensToEdit->emplace_back(PERIOD, NULL2); break;
-        case ',': tokensToEdit->emplace_back(COMMA, NULL2); break;
-        case '?': tokensToEdit->emplace_back(QMARK, NULL2); break;
-        case '@': tokensToEdit->emplace_back(AT, NULL2); break;
-        case '(': tokensToEdit->emplace_back(LP, NULL2); break;
-        case ')': tokensToEdit->emplace_back(RP, NULL2); break;
-        case '{': tokensToEdit->emplace_back(L3, NULL2); break;
-        case '}': tokensToEdit->emplace_back(R3, NULL2); break;
-        case ';': tokensToEdit->emplace_back(SC, NULL2); break;
-        case ':': tokensToEdit->emplace_back(COLON, NULL2); break;
-        case '+': tokensToEdit->emplace_back(PLUS, NULL2); break;
-        case '-': tokensToEdit->emplace_back(MINUS, NULL2); break;
-        case '/': tokensToEdit->emplace_back(DIVISION, NULL2); break;
-        case '%': tokensToEdit->emplace_back(MODULO, NULL2); break;
-        case '*': tokensToEdit->emplace_back(TIMES, NULL2); break;
-        case '\t': tokensToEdit->emplace_back(TAB, NULL2); break;
-        case ' ' : tokensToEdit->emplace_back(SPACE, NULL2); break;
-        case '\n': tokensToEdit->emplace_back(NEWLINE, NULL2); break;
+        case '.': tokensToEdit.emplace_back(PERIOD, NULL2); break;
+        case ',': tokensToEdit.emplace_back(COMMA, NULL2); break;
+        case '?': tokensToEdit.emplace_back(QMARK, NULL2); break;
+        case '@': tokensToEdit.emplace_back(AT, NULL2); break;
+        case '(': tokensToEdit.emplace_back(LP, NULL2); break;
+        case ')': tokensToEdit.emplace_back(RP, NULL2); break;
+        case '{': tokensToEdit.emplace_back(L3, NULL2); break;
+        case '}': tokensToEdit.emplace_back(R3, NULL2); break;
+        case ';': tokensToEdit.emplace_back(SC, NULL2); break;
+        case ':': tokensToEdit.emplace_back(COLON, NULL2); break;
+        case '+': tokensToEdit.emplace_back(PLUS, NULL2); break;
+        case '-': tokensToEdit.emplace_back(MINUS, NULL2); break;
+        case '/': tokensToEdit.emplace_back(DIVISION, NULL2); break;
+        case '%': tokensToEdit.emplace_back(MODULO, NULL2); break;
+        case '*': tokensToEdit.emplace_back(TIMES, NULL2); break;
+        case '\t': tokensToEdit.emplace_back(TAB, NULL2); break;
+        case ' ' : tokensToEdit.emplace_back(SPACE, NULL2); break;
+        case '\n': tokensToEdit.emplace_back(NEWLINE, NULL2); break;
 
         default:
             printf("Character not recognized by Lexer");
@@ -86,7 +86,7 @@ Token Lexer::ListToToken(FILE *preFile) {
             return *returnToken;
         };
 
-        MakeToken(preFile, tokenVector, currChar);
+        MakeToken(preFile, *tokenVector, currChar);
     }
 
     // Return a token with the information gathered
@@ -165,7 +165,7 @@ void Lexer::PrintToFile() {
     int i = 0;
 
     // Print each token to the file
-    for (auto token : tokens) {
+    for (Token& token : tokens) {
 
         // Print the token number and type
         fprintf(outFile, "Token #%d %s ", i, typeName[token.type]);

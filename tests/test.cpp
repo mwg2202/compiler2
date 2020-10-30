@@ -19,15 +19,10 @@ TEST_CASE ("Testing the Command Line Parser") {
     REQUIRE(strcasecmp(cmdParser.cmdParserData.outputTokenStream, "test.tokens") == 0);
     REQUIRE(strcasecmp(cmdParser.cmdParserData.preprocessorOutput, "processed.out") == 0);
 
+    SECTION("Testing the Preprocessor") {
+        Preprocessor preprocessor(cmdParser);
+        SECTION("Testing the Lexer") {
+            Lexer lexer(cmdParser);
+        }
+    }
 }
-
-/*
-TEST_CASE ("Testing the Preprocessor") {
-    Preprocessor preprocessor (cmdparser);
-}
-
-TEST_CASE ("Testing the Lexer") {
-    Lexer lexer = (cmdparser);
-}
-
-*/

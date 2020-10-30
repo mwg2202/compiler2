@@ -28,7 +28,7 @@ class Lexer {
         
         // Reads the file and turns the text into a stream of tokens
         Lexer(CmdParser);
-        void MakeToken(FILE*, std::vector<Token> *, char);
+        void MakeToken(FILE*, std::vector<Token> &, char);
         Token ListToToken(FILE*);
         Token MakeStringToken(FILE*, Type, char);
         void PrintToFile();

@@ -3,78 +3,73 @@
 #include <cstring>
 #include "CmdParser.hpp"
 
-CmdParser::CmdParser ( const int argc, char *argv[]) {
+CmdParser::CmdParser (int argc, char *argv[]) {
+    std::vector<std::string> argList(argv, argv + argc);
+    Parse(argList);
+}
 
-    char *currArg = NULL;
+CmdParser::Parse(std::vector<std::string> &argList) {
+
     bool inputFileSpecified = false; 
     bool preprocessorOutputSpecified = false;
         
 
     for (int i = 1; i < argc; i++) {
-        currArg = argv[i];
-        if (currArg[0] == '-') {
+        if (argList[i][0] == '-') {
 
-            switch (currArg[1]) {
+            switch (argList[i][1]) {
+                
                 case 'h':
                     PrintHelpScreen();
                     std::exit(1);
+                
                 case 'i':
-                    if (i < argc - 1) cmdParserData.includeDir = argv[i+1];
-                    else {
-                        printf("Error: \"-%c\" flag requires a parameter\n", currArg[1]);
-                        std::exit(1);
-                    };
+                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
+                        cmdParserData.includeDir = argList[++i];
+                    else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
+                
                 case 'o':
-                    if (i < argc - 1) cmdParserData.outputFile = argv[i+1];
-                    else {
-                        printf("Error: \"-%c\" flag requires a parameter\n", currArg[1]);
-                        exit(1);
-                    };
+                    if ((i < argc - 1) && (argList [i+1][0] != '-')) 
+                        cmdParserData.outputFile = argList[++i];
+                    else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
+                
                 case 'p':
                     preprocessorOutputSpecified = true;
-                    if (i < argc - 1) cmdParserData.preprocessorOutput = argv[++i];
-                    else {
-                        printf("Error: \"-%c\" flag requires a parameter\n", currArg[1]);
-                        exit(1);
-                    }
+                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
+                        cmdParserData.preprocessorOutput = argList[++i];
+                    else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
+
                 case 't':
-                    if (i < argc - 1) cmdParserData.outputTokenStream = argv[++i];
-                    else {
-                        printf("Error: \"-%c\" flag requires a parameter\n", currArg[1]);
-                        exit(1);
-                    }
+                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
+                        cmdParserData.outputTokenStream = argv[++i];
+                    else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
 
                 case 'v':
                     PrintVersion();
                     std::exit(1);
+                
                 default:
-                    printf("Error: \"-%c\" invalid flag\n", currArg[1]);
-                    std::exit(1);
+                    PrintError(CMDPARSER, ArgList[i]);
             }
 
         } else {
             inputFileSpecified = true;
-            cmdParserData.inputFile = argv[i];
+            cmdParserData.inputFile = argList[i];
         }
     }
 
-    if (!inputFileSpecified) {
-        printf("Error: no input file specified\n");
-        exit(1);
-    }
+    if (!inputFileSpecified) PrintError(NO_INPUT_FILE);
 
-    if (!preprocessorOutputSpecified) {
-        char ending[] = ".tmp";
-        cmdParserData.preprocessorOutput = new char[strlen(cmdParserData.inputFile) + 4];
-        strcpy(cmdParserData.preprocessorOutput, cmdParserData.inputFile);
-        strcat(cmdParserData.preprocessorOutput, ending);
-    }
+    // If thee preprocessor output file wasn't specified just use inputFile.tmp
+    if (!preprocessorOutputSpecified)
+        cmdParserData.preprocessorOutput = cmdParserData.inputFile << ".tmp";
 }
 
+// Print the help screen
 void CmdParser::PrintHelpScreen() {
     printf(R"~(
 Usage: ./a.out [options] file...
@@ -85,16 +80,44 @@ Options:
     -i, --includeDir <directory>    Sets the directory to include files
     -o, --output <file>             Sets the location of the output executable
     -p, --preprocessor <file>       Saves the preprocessed file
-    -v, --version                   Displays the compiler version
     -t, --token <file>              Prints the token stream to a file
+    -v, --version                   Displays the compiler version
 
 )~");
 }
 
+// Print the version information
 void CmdParser::PrintVersion() {
     printf( R"~(
-    Compiler Version: 0.01 (Nonfunctioning)
+    Compiler Version: 0.02 (Nonfunctioning)
     Langugage Specification Version: 0
 
 )~");
+}
+
+void PrintError(ErrorCode errorCode, std::string& errorString = "") {
+    
+    switch ErrorCode {
+
+       // errorString can contain any string 
+        case (NO_INPUT_FILE):
+            std::cerr << "Error: no input file specified" std::endl;
+            std::exit(1);
+        
+        // errorString contains flag referenced
+        case (FLAG_REQUIRES_PARAMETER):
+            std::cerr << "Error: flag requires a paramater \'" << errorString <<  "\'" << std::endl;
+            std::exit(1);
+        
+        // errorString contains flag referenced
+        case (INVALID_FLAG):
+            std::cerr << "Error: invalid flag \'" << errorString << "\'"<< std::endl;
+            std::exit(1);
+
+        // errorString contains error message
+        default:
+            std::cerr << "Error: " << errorString << std::endl;
+            break;
+    
+    }
 }
