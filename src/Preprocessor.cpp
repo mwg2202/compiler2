@@ -1,67 +1,70 @@
-nclude <cstdio>
+#include <cstdio>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include "Preprocessor.hpp"
 
-
 Preprocessor::Preprocessor(CmdParser cmdParser)
     :cmdParserData(cmdParser.cmdParserData) {
-   
-    // Open the source file
-    FILE *srcFile = fopen(cmdParserData.inputFile, "r");
-    if (srcFile == NULL) {
-        printf("Error: Unable to open file \"%s\"\n",cmdParserData.inputFile );
-        std::exit(1);
-    }
 
-    // Open the preprocessor output file
-    FILE *preFile = fopen(cmdParserData.preprocessorOutput, "w");
+    fstream inputFile(cmdParserData.inputFile);
+    if (inputFile.fail()) cmdParser.PrintError(
+            UNABLE_TO_OPEN, cmdParserData.inputFile);
+
+    fstream outputFile(cmdParserData.preprocessorOutput);
+    if (outputFile.fail()) cmdParser.PrintError(
+            UNABLE_TO_OPEN, cmdParserData.preprocessorOutput);
+    
+    Parse(inputFile, outputFile);
+    return;
+}
+
+void Preprocessor::Parse(fstream inputFile, fstream outputFile) {
 
     // Initiate variables
     char currChar = '\0';
-    char includeFile[255];
-    unsigned long int currentLineNumber;
-    char trash[31];
-    char include[] = "include";
+    std::string directiveData;
+    const std::string _include = "include";
 
     // Read each character
-    while (fscanf(srcFile, "%c", &currChar) != EOF) {
-        
+    while (srcFile.get(currChar)) {
+
         switch (currChar) {
 
             // Single Line Comments
             case '#':
-                while (fscanf(srcFile, "%c", &currChar) != EOF) {
-                    if (currChar == '\n') break;
-                }
+                srcFile.ignore(numeric_limits<streamsize>::max(), '\n');
                 break;
 
             // Multi-Line Comments
             case '~':
-                while (int notEOF = fscanf(srcFile, "%c", &currChar) != EOF) {
-                    if (currChar == '~') break;
-                    else if (!notEOF) {
-                        printf("Error: Multi-line comment must end\n");
-                        std::exit(1);
-                    };
-                }
+                srcFile.ignore(numeric_limits<streamsize>::max(), '~');
                 break;
 
+            // Preprocessor Directive
             case '@':
-                fscanf(srcFile, "%30s", trash);
-                if (strcasecmp(trash, include) == 0) {
-                    printf("Include was found for ");
-                    if (fscanf(srcFile, "%s", includeFile) != 0) {
-                        printf("%s\n", includeFile);
-                    }
-                }
+                // Get the name of the directive
+                srcFile.get(directiveData, ' ');
+
+                // If the name is include
+                if (directiveData == "include") {
+                    // Get the filename to include
+                    srcFile.ignore(numeric_limits<streamsize>::max(), '"');
+                    srcFile.get(directiveData, '"');
+                    srcFile.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                    // Open and parse the filename
+                    fstream includeFile(directiveData);
+                    Prase(includeFile, inputFile);
+
+                } else cmdParser.PrintError(INVALID_DIRECTIVE, directiveData);
                 break;
+
             default:
-                fprintf(preFile, "%c", currChar);
+                preFile << currChar;
                 break;
         }
     }
-    fclose(srcFile);
-    fclose(preFile);
+    srcFile.close();
+    preFile.close();
 }

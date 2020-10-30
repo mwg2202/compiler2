@@ -101,19 +101,26 @@ void PrintError(ErrorCode errorCode, std::string& errorString = "") {
 
        // errorString can contain any string 
         case (NO_INPUT_FILE):
-            std::cerr << "Error: no input file specified" std::endl;
+            std::cerr << "Error: no input file specified\n";
             std::exit(1);
         
         // errorString contains flag referenced
         case (FLAG_REQUIRES_PARAMETER):
-            std::cerr << "Error: flag requires a paramater \'" << errorString <<  "\'" << std::endl;
+            std::cerr << "Error: flag requires a paramater \'" << errorString << "\'\n";
             std::exit(1);
         
         // errorString contains flag referenced
         case (INVALID_FLAG):
-            std::cerr << "Error: invalid flag \'" << errorString << "\'"<< std::endl;
+            std::cerr << "Error: invalid flag \'" << errorString << "\'\n";
             std::exit(1);
 
+        // errorString contains the filename
+        case (UNABLE_TO_OPEN):
+            std::cerr << "Error: unable to open file \"" << errorString << "\"\n";
+            std::exit(1);
+        case (INVALID_DIRECTIVE):
+            std::cerr << "Error: invalid preprocessor directive \"" << errorString << "\"\n";
+            std::exit(1);
         // errorString contains error message
         default:
             std::cerr << "Error: " << errorString << std::endl;

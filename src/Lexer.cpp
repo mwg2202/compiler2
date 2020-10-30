@@ -1,13 +1,19 @@
 #include "Lexer.hpp"
-#include <ctype.h>
-#include <cstdio>
-#include <cstdlib>
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
 #define NULL2 (void *) NULL
 
 Lexer::Lexer(CmdParser cmdParser): cmdParserData(cmdParser.cmdParserData) {
     
+    ifstream preFile(cmdParserData.preprocessorOutput);
+    if (preFile.fail()) cmdParserData.PrintError(UNABLE_TO_OPEN, 
+            cmdParserData.preprocessorOutput);
+
     // Open the preprocessor output file
-    FILE *preFile = fopen(cmdParserData.preprocessorOutput, "r");
     char currChar = '\0';
     int status = 0;
 
@@ -160,31 +166,33 @@ Token Lexer::MakeStringToken(FILE *preFile, Type type, char testChar) {
 // Print the token stream to a file
 void Lexer::PrintToFile() {
 
-    // Open the output file
-    FILE *outFile = fopen(cmdParserData.outputTokenStream, "w");
+    // Create the outputFile
+    ofstream outFile(cmdParserData.outputTokenStream);
+
     int i = 0;
 
     // Print each token to the file
     for (Token& token : tokens) {
 
         // Print the token number and type
-        fprintf(outFile, "Token #%d %s ", i, typeName[token.type]);
+        outFile << "Token #" << i << ": " << typeName[token.type]);
         
         // Print the token value depending on token type
         // (An int can't be printed the same way as a string)
         switch (token.type) {
             case INT:
-                fprintf(outFile, "%d", * ((int *) token.value));
+                outFile << *((int *) token.value) << std::endl;
             case CHAR:
-                fprintf(outFile, "\'%s\'", (char *) token.value);
+                outFile << (char *) token.value << std::endl;
             case STRING:
-                fprintf(outFile, "\"%s\"", (char *) token.value);
+                outFile << (char *) token.value << std::endl;
             default:
-                fprintf(outFile, "VOID\n");
+                outFile << "VOID" << std::endl;
         }
         i++;
     }
 
+    outFile.close();
     return;
 }
 
