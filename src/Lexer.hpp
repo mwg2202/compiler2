@@ -7,10 +7,10 @@ enum Type {
     NONE = 0, SC, COLON,
     CHAR, STRING, INT,
     PERIOD, COMMA, QMARK, AT,
-    LP, RP, LB, RB, L3, R3, 
+    LP, RP, L3, R3, 
     PLUS, MINUS, DIVISION, MODULO, TIMES,
     TAB, SPACE, NEWLINE,
-    IDENTIFIER
+    LIST, IDENTIFIER
 };
 
 struct Token {
@@ -28,7 +28,9 @@ class Lexer {
         
         // Reads the file and turns the text into a stream of tokens
         Lexer(CmdParser);
-        void MakeStringToken(FILE*, Type, char);
+        void MakeToken(FILE*, std::vector<Token> *, char);
+        Token ListToToken(FILE*);
+        Token MakeStringToken(FILE*, Type, char);
         void PrintToFile();
 };
 
