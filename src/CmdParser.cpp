@@ -3,19 +3,20 @@
 #include <cstring>
 #include "CmdParser.hpp"
 
-CmdParser::CmdParser( const int argc, char *argv[]) {
-    
+CmdParser::CmdParser ( const int argc, char *argv[]) {
+
     char *currArg = NULL;
     bool inputFileSpecified = false; 
     bool preprocessorOutputSpecified = false;
         
+
     for (int i = 1; i < argc; i++) {
         currArg = argv[i];
         if (currArg[0] == '-') {
 
             switch (currArg[1]) {
                 case 'h':
-                    printHelpScreen();
+                    PrintHelpScreen();
                     std::exit(1);
                 case 'i':
                     if (i < argc - 1) cmdParserData.includeDir = argv[i+1];
@@ -48,7 +49,7 @@ CmdParser::CmdParser( const int argc, char *argv[]) {
                     break;
 
                 case 'v':
-                    printVersion();
+                    PrintVersion();
                     std::exit(1);
                 default:
                     printf("Error: \"-%c\" invalid flag\n", currArg[1]);
@@ -74,7 +75,7 @@ CmdParser::CmdParser( const int argc, char *argv[]) {
     }
 }
 
-void CmdParser::printHelpScreen() {
+void CmdParser::PrintHelpScreen() {
     printf(R"~(
 Usage: ./a.out [options] file...
 Compiles source code to an executable
@@ -90,7 +91,7 @@ Options:
 )~");
 }
 
-void CmdParser::printVersion() {
+void CmdParser::PrintVersion() {
     printf( R"~(
     Compiler Version: 0.01 (Nonfunctioning)
     Langugage Specification Version: 0

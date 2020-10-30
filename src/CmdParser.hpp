@@ -12,8 +12,9 @@ class CmdParser {
     public:
         CmdParserData cmdParserData;
 
-        // Parses the command line arguments and sets up cmdParserData
-        CmdParser(const int, char *[]);
-        inline void printHelpScreen();
-        inline void printVersion();
+        CmdParser(int argc, char *argv[]);
+
+        inline void Parse(int argc, char *argv[]);
+        inline void PrintHelpScreen();
+        inline void PrintVersion();
 };
