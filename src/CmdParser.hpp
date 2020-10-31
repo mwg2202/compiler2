@@ -1,5 +1,19 @@
 #pragma once
-#include <stdlib.h>
+#include <iostream>
+#include <vector>
+#include <string>
+
+enum ErrorCode {
+    NO_INPUT_FILE,
+    INVALID_FLAG,
+    FLAG_REQUIRES_PARAMETER,
+    COMMENT_MUST_END,
+    INVALID_DIRECTIVE,
+    INCOMPLETE_ARRAY,
+    UNABLE_TO_OPEN,
+    UNRECOGNIZED_CHAR
+};
+
 struct CmdParserData {
     std::string inputFile;
     std::string outputFile;
@@ -13,19 +27,9 @@ class CmdParser {
         CmdParserData cmdParserData;
         CmdParser(int argc, char *argv[]);
 
-    private:
-        inline void Parse(std::vector<std::string>&);
-        inline void PrintHelpScreen();
-        inline void PrintVersion();
-        inline void PrintError(ErrorCode, std::string&);
+        void Parse(const std::vector<std::string> &);
+        void PrintHelpScreen();
+        void PrintVersion();
+        void PrintError(const ErrorCode, const std::string &);
 };
 
-enum ErrorCode {
-    NO_INPUT_FILE,
-    INVALID_FLAG,
-    FLAG_REQUIRES_PARAMETER,
-    INVALID_FILE,
-    COMMENT_MUST_END,
-    INVALID_DIRECTIVE,
-    INCOMPLETE_ARRAY
-}

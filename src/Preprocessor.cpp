@@ -1,25 +1,29 @@
-#include <cstdio>
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
+#include <limits>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
 #include "Preprocessor.hpp"
 
-Preprocessor::Preprocessor(CmdParser cmdParser)
-    :cmdParserData(cmdParser.cmdParserData) {
+Preprocessor::Preprocessor(CmdParser cmdParser) 
+    :cmdParserData(cmdParser.cmdParserData), cmdParser(cmdParser) {
 
-    fstream inputFile(cmdParserData.inputFile);
+    std::fstream inputFile(cmdParserData.inputFile);
     if (inputFile.fail()) cmdParser.PrintError(
             UNABLE_TO_OPEN, cmdParserData.inputFile);
 
-    fstream outputFile(cmdParserData.preprocessorOutput);
+    std::fstream outputFile(cmdParserData.preprocessorOutput);
     if (outputFile.fail()) cmdParser.PrintError(
             UNABLE_TO_OPEN, cmdParserData.preprocessorOutput);
     
     Parse(inputFile, outputFile);
+    
+    inputFile.close();
+    outputFile.close();
     return;
 }
 
-void Preprocessor::Parse(fstream inputFile, fstream outputFile) {
+void Preprocessor::Parse(std::fstream &inputFile, std::fstream &outputFile) {
 
     // Initiate variables
     char currChar = '\0';
@@ -27,44 +31,42 @@ void Preprocessor::Parse(fstream inputFile, fstream outputFile) {
     const std::string _include = "include";
 
     // Read each character
-    while (srcFile.get(currChar)) {
-
+    while (!inputFile.eof()) {
+        inputFile.get(currChar);
         switch (currChar) {
 
             // Single Line Comments
             case '#':
-                srcFile.ignore(numeric_limits<streamsize>::max(), '\n');
+                inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 break;
 
             // Multi-Line Comments
             case '~':
-                srcFile.ignore(numeric_limits<streamsize>::max(), '~');
+                inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '~');
                 break;
 
             // Preprocessor Directive
             case '@':
                 // Get the name of the directive
-                srcFile.get(directiveData, ' ');
+                getline(inputFile, directiveData, ' ');
 
                 // If the name is include
                 if (directiveData == "include") {
                     // Get the filename to include
-                    srcFile.ignore(numeric_limits<streamsize>::max(), '"');
-                    srcFile.get(directiveData, '"');
-                    srcFile.ignore(numeric_limits<streamsize>::max(), '\n');
+                    inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '"');
+                    getline(inputFile, directiveData, '"');
+                    inputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
                     // Open and parse the filename
-                    fstream includeFile(directiveData);
-                    Prase(includeFile, inputFile);
+                    std::fstream includeFile(directiveData);
+                    Parse(includeFile, inputFile);
 
                 } else cmdParser.PrintError(INVALID_DIRECTIVE, directiveData);
                 break;
 
             default:
-                preFile << currChar;
+                outputFile << currChar;
                 break;
         }
     }
-    srcFile.close();
-    preFile.close();
 }

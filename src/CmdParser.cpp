@@ -8,13 +8,13 @@ CmdParser::CmdParser (int argc, char *argv[]) {
     Parse(argList);
 }
 
-CmdParser::Parse(std::vector<std::string> &argList) {
+void CmdParser::Parse(const std::vector<std::string> &argList) {
 
     bool inputFileSpecified = false; 
     bool preprocessorOutputSpecified = false;
         
 
-    for (int i = 1; i < argc; i++) {
+    for (int i = 1; i < argList.size(); i++) {
         if (argList[i][0] == '-') {
 
             switch (argList[i][1]) {
@@ -24,27 +24,27 @@ CmdParser::Parse(std::vector<std::string> &argList) {
                     std::exit(1);
                 
                 case 'i':
-                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
+                    if ((i < argList.size() - 1) && (argList[i+1][0] != '-')) 
                         cmdParserData.includeDir = argList[++i];
                     else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
                 
                 case 'o':
-                    if ((i < argc - 1) && (argList [i+1][0] != '-')) 
+                    if ((i < argList.size() - 1) && (argList[i+1][0] != '-')) 
                         cmdParserData.outputFile = argList[++i];
                     else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
                 
                 case 'p':
                     preprocessorOutputSpecified = true;
-                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
+                    if ((i < argList.size() - 1) && (argList[i+1][0] != '-')) 
                         cmdParserData.preprocessorOutput = argList[++i];
                     else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
 
                 case 't':
-                    if ((i < argc-1) && (argList[i+1][0] != '-')) 
-                        cmdParserData.outputTokenStream = argv[++i];
+                    if ((i < argList.size() - 1) && (argList[i+1][0] != '-')) 
+                        cmdParserData.outputTokenStream = argList[++i];
                     else PrintError(FLAG_REQUIRES_PARAMETER, argList[i]);
                     break;
 
@@ -53,7 +53,7 @@ CmdParser::Parse(std::vector<std::string> &argList) {
                     std::exit(1);
                 
                 default:
-                    PrintError(CMDPARSER, ArgList[i]);
+                    PrintError(INVALID_FLAG, argList[i]);
             }
 
         } else {
@@ -61,12 +61,13 @@ CmdParser::Parse(std::vector<std::string> &argList) {
             cmdParserData.inputFile = argList[i];
         }
     }
-
-    if (!inputFileSpecified) PrintError(NO_INPUT_FILE);
+    
+    std::string trash = "Hello";
+    if (!inputFileSpecified) PrintError(NO_INPUT_FILE, trash);
 
     // If thee preprocessor output file wasn't specified just use inputFile.tmp
     if (!preprocessorOutputSpecified)
-        cmdParserData.preprocessorOutput = cmdParserData.inputFile << ".tmp";
+        cmdParserData.preprocessorOutput = cmdParserData.inputFile + ".tmp";
 }
 
 // Print the help screen
@@ -95,9 +96,9 @@ void CmdParser::PrintVersion() {
 )~");
 }
 
-void PrintError(ErrorCode errorCode, std::string& errorString = "") {
+void CmdParser::PrintError(const ErrorCode errorCode, const std::string &errorString) {
     
-    switch ErrorCode {
+    switch (errorCode) {
 
        // errorString can contain any string 
         case (NO_INPUT_FILE):

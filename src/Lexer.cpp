@@ -4,43 +4,40 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <regex>
 
-#define NULL2 (void *) NULL
-
-Lexer::Lexer(CmdParser cmdParser): cmdParserData(cmdParser.cmdParserData) {
+Lexer::Lexer(CmdParser cmdParser): 
+    cmdParserData(cmdParser.cmdParserData), cmdParser(cmdParser) {
     
     // Open the preprocessor output file
-    ifstream inputFile(cmdParserData.preprocessorOutput);
-    if (inputFile.fail()) cmdParserData.PrintError(UNABLE_TO_OPEN, 
+    std::ifstream inputFile(cmdParserData.preprocessorOutput);
+    if (inputFile.fail()) cmdParser.PrintError(UNABLE_TO_OPEN, 
             cmdParserData.preprocessorOutput);
 
     // Create the tokenstream
-    tokens = MakeTokenStream(inputFile)
+    tokens = MakeTokenStream(inputFile);
 
-    // Print the token stream to a file if requested by user
-    if (cmdParserData.outputTokenStream != NULL) 
     // Create the outputFile
-    ofstream outputFile(cmdParserData.outputTokenStream);
-    if (outputFile.fail()) cmdParserData.PrintError(UNABLE_TO_OPEN,
+    std::ofstream outputFile(cmdParserData.outputTokenStream);
+    if (outputFile.fail()) cmdParser.PrintError(UNABLE_TO_OPEN,
         cmdParserData.outputTokenStream);
 
     // Print the token stream to the file
-    PrintTokenStreamToFile(tokens, outputFile);
+    PrintToFile(tokens, outputFile);
     return;
 }
 
 // Returns a token stream created out of the inputFile
-std::vector<Token> MakeTokenStream(ifstream &inputFile) {
+std::vector<Token> Lexer::MakeTokenStream(std::ifstream &inputFile) {
+    std::vector<Token> tokenStream;
     while (!inputFile.eof()) {
-        std::vector<Token> tokenStream;
-        tokenStream.emplace_back(MakeToken(inputFile, tokenStream))
+        tokenStream.emplace_back(MakeToken(inputFile));
     }
+    return tokenStream;
 }
 
 // Returns the next token in the input file stream
 // (Moves the file stream to the end of the token in the process)
-Token Lexer::MakeToken(ifstream &inputFile) {
+Token Lexer::MakeToken(std::ifstream &inputFile) {
     char currChar;
     inputFile.get(currChar);
 
@@ -51,15 +48,15 @@ Token Lexer::MakeToken(ifstream &inputFile) {
         while (isdigit(currChar)) digitString += currChar;
 
         // Create the return token
-        Token returnToken (INT, digitString.stoi()); 
+        Token returnToken (INT, std::stoi(digitString)); 
         return returnToken;
     }
 
     // If it is a string
-    if (currChar == "\"") {
+    if (currChar == '\"') {
         // Create the token's value
         std::string tokenValue;
-        inputFile.get(tokenValue, "\"");
+        std::getline(inputFile, tokenValue, '\"');
 
         // Create the return token
         Token returnToken(STRING, tokenValue);
@@ -67,47 +64,51 @@ Token Lexer::MakeToken(ifstream &inputFile) {
     }
 
     // If it is a char array
-    if (currChar == "\'") {
+    if (currChar == '\'') {
         // Create the token's value
         std::string tokenValue;
-        inputFile.get(tokenValue, "\'");
+        std::getline(inputFile, tokenValue, '\'');
         
         // Create the return token
         Token returnToken(CHAR, tokenValue);
         return returnToken;
     }
     
+    // Characters not allowed in identifiers
+    const std::string BannedCharacters = "(){}[];\n\t\" \'";
+
+    // If we do not find a banned character, assume its the start
+    // of an identifier
+    if (BannedCharacters.find(currChar) == std::string::npos) {
+        std::string tokenValue; 
+        // Gather characters until we find an invalid one
+        while(BannedCharacters.find(currChar) == std::string::npos) {
+            tokenValue += currChar;
+            inputFile.get(currChar);
+        }
+        Token returnToken(OPERATOR, tokenValue);
+    }
+
     // Else, create the token using the following
     Token returnToken;
     switch (currChar) {
-        case '.': returnToken.type = PERIOD;    return returnToken;
-        case ',': returnToken.type = COMMA;     return returnToken;
-        case '?': returnToken.type = QMARK;     return returnToken;
-        case '@': returnToken.type = AT;        return returnToken;
         case '(': returnToken.type = LP;        return returnToken;
         case ')': returnToken.type = RP;        return returnToken;
         case '{': returnToken.type = L3;        return returnToken;
         case '}': returnToken.type = R3;        return returnToken;
+        case '[': returnToken.type = LB;        return returnToken;
+        case ']': returnToken.type = RB;        return returnToken;
         case ';': returnToken.type = SC;        return returnToken;
-        case ':': returnToken.type = COLON;     return returnToken;
-        case '+': returnToken.type = PLUS;      return returnToken;
-        case '-': returnToken.type = MINUS;     return returnToken;
-        case '/': returnToken.type = DIVISION;  return returnToken;
-        case '%': returnToken.type = MODULO;    return returnToken;
-        case '*': returnToken.type = TIMES;     return returnToken;
-        case '\t': returnToken.type = TAB;      return returnToken;
-        case ' ' : returnToken.type = SPACE;    return returnToken;
         case '\n': returnToken.type = NEWLINE;  return returnToken;
         default:
-            returnToken.type = IDENTIFIER;
-            inputFile.get(returnToken.stringValue, '(', ')', ' ');
-            return returnToken;
-            cmdParser.PrintError(UNRECOGNIZED_CHAR);
+            std::string trash = "Hello";
+            cmdParser.PrintError(UNRECOGNIZED_CHAR, trash);
     }
+    return returnToken;
 }
 
 // Print the token stream to a file
-void Lexer::PrintToFile(std::vector<Token> &tokenStream, ofstream &outFile) {
+void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile) {
     int i = 0;
 
     // Print each token to the file
@@ -120,11 +121,11 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, ofstream &outFile) {
         // (An int can't be printed the same way as a string)
         switch (token.type) {
             case INT:
-                outFile << *((int *) token.value) << std::endl;
+                outFile << token.intValue << std::endl;
             case CHAR:
-                outFile << (char *) token.value << std::endl;
+                outFile << token.stringValue << std::endl;
             case STRING:
-                outFile << (char *) token.value << std::endl;
+                outFile << token.stringValue << std::endl;
             default:
                 outFile << "VOID" << std::endl;
         }
@@ -138,9 +139,6 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, ofstream &outFile) {
 const char *typeName[] = {
     "NONE", "SC", "COLON",
     "CHAR", "STRING", "INT",
-    "PERIOD", "COMMA", "QMARK", "AT",
     "LP", "RP", "L3", "R3",
-    "PLUS", "MINUS", "DIVISION", "MODULO", "TIMES",
-    "TAB", "SPACE", "NEWLINE",
-    "LIST", "IDENTIFIER"
+    "NEWLINE", "OPERATOR"
 };
