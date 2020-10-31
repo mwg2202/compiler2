@@ -1,37 +1,41 @@
 #pragma once
 #include "CmdParser.hpp"
-#include <cstdio>
+#include <fstream>
 #include <vector>
 
 enum Type {
-    NONE = 0, SC, COLON,
+    NONE = 0, SC,
     CHAR, STRING, INT,
-    PERIOD, COMMA, QMARK, AT,
-    LP, RP, L3, R3, 
-    PLUS, MINUS, DIVISION, MODULO, TIMES,
-    TAB, SPACE, NEWLINE,
-    LIST, IDENTIFIER
+    LP, RP, LB, RB, L3, R3, 
+    NEWLINE, OPERATOR 
 };
 
 struct Token {
     Type type = NONE;
-    void *value = NULL;
+    std::string stringValue;
+    int intValue;
 
-    inline Token(Type type, void *value): 
-        type(type), value(value) {}
+    inline Token(Type type, std::string stringValue): 
+        type(type), stringValue(stringValue) {}
+    
+    inline Token(Type type, int intValue):
+        type(type), intValue(intValue) {}
+    
+    inline Token() {}
 };
 
 class Lexer {
     public:
         std::vector<Token> tokens;
         CmdParserData cmdParserData; 
-        
+        CmdParser cmdParser;
+
         // Reads the file and turns the text into a stream of tokens
         Lexer(CmdParser);
-        void MakeToken(FILE*, std::vector<Token> *, char);
-        Token ListToToken(FILE*);
-        Token MakeStringToken(FILE*, Type, char);
-        void PrintToFile();
+        std::vector<Token> MakeTokenStream(std::ifstream &);
+        Token MakeToken(std::ifstream &);
+        
+        void PrintToFile(std::vector<Token> &, std::ofstream &);
 };
 
 extern const char *typeName[];
