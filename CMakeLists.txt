@@ -5,18 +5,18 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 project("compiler")
 
-include(FetchContent)
-
 set(files
     "src/CmdParser.cpp"
     "src/Preprocessor.cpp" 
     "src/Lexer.cpp")
 
+# make main executable
 add_executable(${PROJECT_NAME} 
     "src/main.cpp"
     ${files})
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
+# Make test
 add_executable(test 
     "tests/test.cpp"
     ${files})
