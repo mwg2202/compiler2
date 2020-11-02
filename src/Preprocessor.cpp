@@ -12,7 +12,8 @@ Preprocessor::Preprocessor(CmdParser cmdParser)
     if (inputFile.fail()) cmdParser.PrintError(
             UNABLE_TO_OPEN, cmdParserData.inputFile);
 
-    std::fstream outputFile(cmdParserData.preprocessorOutput);
+    std::fstream outputFile(cmdParserData.preprocessorOutput,
+            std::fstream::out);
     if (outputFile.fail()) cmdParser.PrintError(
             UNABLE_TO_OPEN, cmdParserData.preprocessorOutput);
     
@@ -31,7 +32,7 @@ void Preprocessor::Parse(std::fstream &inputFile, std::fstream &outputFile) {
     const std::string _include = "include";
 
     // Read each character
-    while (!inputFile.eof()) {
+    while (inputFile.peek() != EOF) {
         inputFile.get(currChar);
         switch (currChar) {
 
@@ -59,7 +60,7 @@ void Preprocessor::Parse(std::fstream &inputFile, std::fstream &outputFile) {
 
                     // Open and parse the filename
                     std::fstream includeFile(directiveData);
-                    Parse(includeFile, inputFile);
+                    Parse(includeFile, outputFile);
 
                 } else cmdParser.PrintError(INVALID_DIRECTIVE, directiveData);
                 break;

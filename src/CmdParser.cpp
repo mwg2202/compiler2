@@ -90,7 +90,7 @@ Options:
 // Print the version information
 void CmdParser::PrintVersion() {
     printf( R"~(
-    Compiler Version: 0.02 (Nonfunctioning)
+    Compiler Version: 0.03 (Nonfunctioning)
     Langugage Specification Version: 0
 
 )~");
@@ -103,32 +103,46 @@ void CmdParser::PrintError(const ErrorCode errorCode, const std::string &errorSt
        // errorString can contain any string 
         case (NO_INPUT_FILE):
             std::cerr << "Error: no input file specified\n";
-            std::exit(1);
-        
-        // errorString contains flag referenced
-        case (FLAG_REQUIRES_PARAMETER):
-            std::cerr << "Error: flag requires a paramater \'" << errorString << "\'\n";
-            std::exit(1);
+            exit(1);
         
         // errorString contains flag referenced
         case (INVALID_FLAG):
             std::cerr << "Error: invalid flag \'" << errorString << "\'\n";
-            std::exit(1);
+            exit(1);
+        
+        // errorString contains flag referenced
+        case (FLAG_REQUIRES_PARAMETER):
+            std::cerr << "Error: flag requires a paramater \'" << errorString << "\'\n";
+            exit(1);
 
+        // errorString contains trash
+        case (COMMENT_MUST_END):
+            std::cerr << "Error: multi-line comment must end\n";
+            exit(1);
+
+        // errorString contains the directive
+        case (INVALID_DIRECTIVE):
+            std::cerr << "Error: invalid preprocessor directive \"" << errorString << "\"\n";
+            exit(1);
+
+        // errorString contains trash
+        case (INCOMPLETE_ARRAY):
+            std::cerr << "Error: file ended in the middle of a character array or string\n";
+            exit(1);
+        
         // errorString contains the filename
         case (UNABLE_TO_OPEN):
             std::cerr << "Error: unable to open file \"" << errorString << "\"\n";
-            std::exit(1);
-        case (INVALID_DIRECTIVE):
-            std::cerr << "Error: invalid preprocessor directive \"" << errorString << "\"\n";
-            std::exit(1);
+            exit(1);
 
-        case (INCOMPLETE_ARRAY):
-            std::cerr << "Error: File ended in the middle of a character array or string\n";
+        // errorString contains the unrecognized char
+        case (UNRECOGNIZED_CHAR):
+            std::cerr << "Error: lexer can not recognize \"" << errorString << "\"\n";
+            exit(1);
+
         // errorString contains error message
         default:
             std::cerr << "Error: " << errorString << std::endl;
-            break;
-    
+            exit(1); 
     }
 }

@@ -29,7 +29,7 @@ Lexer::Lexer(CmdParser cmdParser):
 // Returns a token stream created out of the inputFile
 std::vector<Token> Lexer::MakeTokenStream(std::ifstream &inputFile) {
     std::vector<Token> tokenStream;
-    while (!inputFile.eof()) {
+    while (inputFile.peek() != EOF) {
         tokenStream.emplace_back(MakeToken(inputFile));
     }
     return tokenStream;
@@ -45,7 +45,10 @@ Token Lexer::MakeToken(std::ifstream &inputFile) {
     if (isdigit(currChar)) {
         // Create the token's value
         std::string digitString;
-        while (isdigit(currChar)) digitString += currChar;
+        while (isdigit(currChar)) {
+            digitString += currChar;
+            inputFile.get(currChar);
+        }
 
         // Create the return token
         Token returnToken (INT, std::stoi(digitString)); 
@@ -87,6 +90,7 @@ Token Lexer::MakeToken(std::ifstream &inputFile) {
             inputFile.get(currChar);
         }
         Token returnToken(OPERATOR, tokenValue);
+        return returnToken;
     }
 
     // Else, create the token using the following
@@ -100,9 +104,10 @@ Token Lexer::MakeToken(std::ifstream &inputFile) {
         case ']': returnToken.type = RB;        return returnToken;
         case ';': returnToken.type = SC;        return returnToken;
         case '\n': returnToken.type = NEWLINE;  return returnToken;
+        case ' ': return MakeToken(inputFile); // skip spaces
         default:
-            std::string trash = "Hello";
-            cmdParser.PrintError(UNRECOGNIZED_CHAR, trash);
+            std::string currCharString(1, currChar);
+            cmdParser.PrintError(UNRECOGNIZED_CHAR, currCharString);
     }
     return returnToken;
 }
@@ -115,19 +120,26 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
     for (Token& token : tokenStream) {
 
         // Print the token number and type
-        outFile << "Token #" << i << ": " << typeName[token.type];
+        outFile << "Token #" << i << ": " << typeName[token.type] << " ";
         
         // Print the token value depending on token type
         // (An int can't be printed the same way as a string)
         switch (token.type) {
             case INT:
                 outFile << token.intValue << std::endl;
+                break;
             case CHAR:
-                outFile << token.stringValue << std::endl;
+                outFile << "\'" << token.stringValue << "\'\n";
+                break;
             case STRING:
+                outFile << "\"" << token.stringValue << "\"\n";
+                break;
+            case OPERATOR:
                 outFile << token.stringValue << std::endl;
+                break;
             default:
                 outFile << "VOID" << std::endl;
+                break;
         }
         i++;
     }
@@ -137,8 +149,8 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
 // A list of the type names 
 // Used in Lexer::PrintToFile
 const char *typeName[] = {
-    "NONE", "SC", "COLON",
+    "NONE", "SC",
     "CHAR", "STRING", "INT",
-    "LP", "RP", "L3", "R3",
+    "LP", "RP", "LB", "RB", "L3", "R3",
     "NEWLINE", "OPERATOR"
 };
