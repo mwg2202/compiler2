@@ -120,7 +120,7 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
     for (Token& token : tokenStream) {
 
         // Print the token number and type
-        outFile << "Token #" << i << ": " << typeName[token.type] << " ";
+        outFile << "Token #" << i << ": " << typeNames[token.type] << " ";
         
         // Print the token value depending on token type
         // (An int can't be printed the same way as a string)
@@ -145,12 +145,3 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
     }
     return;
 }
-
-// A list of the type names 
-// Used in Lexer::PrintToFile
-const char *typeName[] = {
-    "NONE", "SC",
-    "CHAR", "STRING", "INT",
-    "LP", "RP", "LB", "RB", "L3", "R3",
-    "NEWLINE", "OPERATOR"
-};
