@@ -51,7 +51,7 @@ Token Lexer::MakeToken(std::ifstream &inputFile) {
         }
 
         // Create the return token
-        Token returnToken (INT, std::stoi(digitString)); 
+        Token returnToken (INT, digitString); 
         return returnToken;
     }
 
@@ -125,17 +125,15 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
         // Print the token value depending on token type
         // (An int can't be printed the same way as a string)
         switch (token.type) {
-            case INT:
-                outFile << token.intValue << std::endl;
-                break;
             case CHAR:
-                outFile << "\'" << token.stringValue << "\'\n";
+                outFile << "\'" << token.matchedString << "\'\n";
                 break;
             case STRING:
-                outFile << "\"" << token.stringValue << "\"\n";
+                outFile << "\"" << token.matchedString << "\"\n";
                 break;
+            case INT:
             case OPERATOR:
-                outFile << token.stringValue << std::endl;
+                outFile << token.matchedString << std::endl;
                 break;
             default:
                 outFile << "VOID" << std::endl;

@@ -21,14 +21,10 @@ const std::string typeNames[] = {
 
 struct Token {
     Type type = NONE;
-    std::string stringValue;
-    int intValue;
+    std::string matchedString;
 
-    inline Token(Type type, std::string &stringValue): 
-        type(type), stringValue(stringValue) {}
-    
-    inline Token(Type type, int intValue):
-        type(type), intValue(intValue) {}
+    inline Token(Type type, std::string &matchedString): 
+        type(type), matchedString(matchedString) {}
     
     inline Token() {}
 };
