@@ -139,7 +139,9 @@ void CmdParser::PrintError(const ErrorCode errorCode, const std::string &errorSt
         case (UNRECOGNIZED_CHAR):
             std::cerr << "Error: lexer can not recognize \"" << errorString << "\"\n";
             exit(1);
-
+        case (MULTIPLE_PERIODS):
+            std::cerr << "Error: multiple periods were found in one float\n";
+            exit(1);
         // errorString contains error message
         default:
             std::cerr << "Error: " << errorString << std::endl;

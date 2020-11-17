@@ -11,7 +11,8 @@ enum ErrorCode {
     INVALID_DIRECTIVE,
     INCOMPLETE_ARRAY,
     UNABLE_TO_OPEN,
-    UNRECOGNIZED_CHAR
+    UNRECOGNIZED_CHAR,
+    MULTIPLE_PERIODS
 };
 
 struct CmdParserData {

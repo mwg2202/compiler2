@@ -45,14 +45,23 @@ Token Lexer::MakeToken(std::ifstream &inputFile) {
     if (isdigit(currChar)) {
         // Create the token's value
         std::string digitString;
-        while (isdigit(currChar)) {
+        bool foundPeriod = false;
+        while (isdigit(currChar) || currChar == '.') {
             digitString += currChar;
+            if (currChar == '.') {
+                    if (foundPeriod) cmdParser.PrintError(MULTIPLE_PERIODS, digitString);
+                    else foundPeriod = true;
+            }
             inputFile.get(currChar);
         }
 
         // Create the return token
-        Token returnToken (INT, digitString); 
-        return returnToken;
+        if (foundPeriod) {
+            Token returnToken(FLOAT, digitString);
+            return returnToken;
+        } 
+        Token returnToken(INT, digitString);
+        return returnToken; 
     }
 
     // If it is a string
@@ -131,6 +140,7 @@ void Lexer::PrintToFile(std::vector<Token> &tokenStream, std::ofstream &outFile)
             case STRING:
                 outFile << "\"" << token.matchedString << "\"\n";
                 break;
+            case FLOAT:
             case INT:
             case OPERATOR:
                 outFile << token.matchedString << std::endl;

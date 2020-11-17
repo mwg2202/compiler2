@@ -5,7 +5,7 @@
 
 enum Type {
     NONE = 0, SC,
-    CHAR, STRING, INT,
+    CHAR, STRING, INT, FLOAT,
     LP, RP, LB, RB, L3, R3, 
     NEWLINE, OPERATOR 
 };
@@ -14,7 +14,7 @@ enum Type {
 // Used in Lexer::PrintToFile
 const std::string typeNames[] = {
     "NONE", "SC",
-    "CHAR", "STRING", "INT",
+    "CHAR", "STRING", "INT", "FLOAT",
     "LP", "RP", "LB", "RB", "L3", "R3",
     "NEWLINE", "OPERATOR"
 };
