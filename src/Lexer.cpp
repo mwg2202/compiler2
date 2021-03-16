@@ -17,12 +17,15 @@ Lexer::Lexer(CmdParser cmdParser):
     tokens = MakeTokenStream(inputFile);
 
     // Create the outputFile
-    std::ofstream outputFile(cmdParserData.outputTokenStream);
-    if (outputFile.fail()) cmdParser.PrintError(UNABLE_TO_OPEN,
-        cmdParserData.outputTokenStream);
+    if (cmdParserData.outputTokenStream != "") {
+        std::ofstream outputFile(cmdParserData.outputTokenStream);
+        if (outputFile.fail()) cmdParser.PrintError(UNABLE_TO_OPEN,
+            cmdParserData.outputTokenStream);
+        
+        // Print the token stream to the file
+        PrintToFile(tokens, outputFile);
+    }
 
-    // Print the token stream to the file
-    PrintToFile(tokens, outputFile);
     return;
 }
 

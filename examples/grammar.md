@@ -1,26 +1,20 @@
 #Language Grammar
 
 expression
-    - LP expression RP
-    - L3 expression L3
-    - (NL|SC) expression (NL|SC)
-    - IDENTIFIER argument*
+    - (LP|L3) item* (RP|R3)
 
-argument
+item
     - expression
-    - data
-
-data
     - INT
     - FLOAT
+    - quote
     - STRING
-    - IDENTIFIER
-    - LIST
     - CHAR
+    - nil
+    - IDENTIFIER
 
-list
-    - LB data* RB (possibly only allowing the same kind of data throughout)
-
-Tokens needed: LP, RP, LB, RB, L3, R3, SC, NL, INT, FLOAT, STRING, IDENTIFIER, LIST, CHAR
+Tokens needed: LP, RP, LB, RB, L3, R3, SC, NL, INT, FLOAT, STRING, IDENTIFIER, CHAR
 
 * IDENTIFIER is used for both variables and operators
+
+

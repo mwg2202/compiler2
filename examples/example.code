@@ -1,0 +1,29 @@
+~ Basics ~
+
+# Like other lisp-like languages this language uses polish notation
+(print (/ (+ 3 5) 2))
+
+# Line breaks can separate expressions
+print (/ (+ 3 5) 2)
+
+# Both print statements are valid
+
+~ S-expressions ~
+
+# All of these define the same s-expression
+'(print Hello World)
+[(print Hello World)]
+[print Hello World]
+
+# S-expressions can be concatenated by their addition
+(+ 'print 'Hello 'World)
+
+# S-expressions can be evaluated through *
+*[print Hello World]
+
+# The entirety of a compilation unit is an s-expression which is evaluated at run-time
+
+~ Macros ~
+
+# Macros are just operators which take s-expressions as input and return an s-expression
+# Once the compiler notices that an operator 

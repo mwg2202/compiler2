@@ -18,8 +18,8 @@ enum ErrorCode {
 struct CmdParserData {
     std::string inputFile;
     std::string outputFile;
-    std::string includeDir;
-    std::string outputTokenStream;
+    std::string includeDir = "./";
+    std::string outputTokenStream = "";
     std::string preprocessorOutput;
 };
 

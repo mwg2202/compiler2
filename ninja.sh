@@ -1,5 +1,2 @@
-mkdir -p build
-cd build
-cmake -GNinja ..
+cmake -GNinja -b build
 ninja
-

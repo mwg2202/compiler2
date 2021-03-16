@@ -1,24 +1,38 @@
 #pragma once
 #include "CmdParser.hpp"
 #include "Lexer.hpp"
+#include "ParseTree.hpp"
 #include <vector>
 
+// If the node is a terminal node, the name is the token's appropriate value
+// e.g. the stringValue for a STRING, the intValue converted to a string for an INT
+enum class NodeName {
+    EXPRESSION = 0,
+    ARGUMENT,
+    DATA,
+    LIST
+};
+
+const std::string nodeNames[] = {
+    "expression",
+    "argument",
+    "data",
+    "list"
+};
+
+
 struct Node {
-    std::string *name;
-    Node *parentNode;
-    std::vector<Node> childNodes;
-    Token *token;
-    inline Node(std::string name, Node *parentNode, Token *token): 
-        parentNode(parentNode), token(token), name(name) {}
     
-    inline Node(std::string name, Node *parentNode): 
-        parentNode(parentNode), token((Token *) NULL), name(name) {}
-}
+    inline Node(Node parentNode): 
+        parentNode(parentNode) {std::cout << "Parsed: " << name << "\n";}
+    inline Node(){}
+};
 
 class Parser {
     public:
-        Node baseNode((Node *) NULL, (Token *) NULL); // Top node of the tree
-    private:
-        void Parse(std::vector<Token> &tokens);
+        Parser(std::vector<Token>&);
+        Node baseNode; // Top node of the tree
         std::vector<Token> tokens;
+
+        void Parse(std::vector<Token> &tokens, int i, Node &parentNode);
 };

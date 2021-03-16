@@ -3,11 +3,12 @@
 #include <fstream>
 #include <vector>
 
-enum Type {
+enum class Type {
     NONE = 0, SC,
     CHAR, STRING, INT, FLOAT,
     LP, RP, LB, RB, L3, R3, 
-    NEWLINE, OPERATOR 
+    NEWLINE, OPERATOR
+<<
 };
 
 // A list of the type names 
@@ -22,6 +23,7 @@ const std::string typeNames[] = {
 struct Token {
     Type type = NONE;
     std::string matchedString;
+    // start index
 
     inline Token(Type type, std::string &matchedString): 
         type(type), matchedString(matchedString) {}
